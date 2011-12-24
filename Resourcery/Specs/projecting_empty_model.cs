@@ -12,10 +12,6 @@ namespace Resourcery.Specs
 
 		protected static void project<T>(T model) { projection =  resourcery.Project(model); }
 	
-		protected static ResourceNameConvention resource_name_convention(Func<Type,object,string> convention)
-		{
-			return resourcery.BuildResourceTypeNameUsing(convention);
-		}
 	}
 	
 	public class projecting_empty_model : with_resourcery
@@ -29,7 +25,7 @@ namespace Resourcery.Specs
 
 	public class resource_name_convention : with_resourcery
 	{
-		Establish context = () => resource_name_convention((t, i) => "test");
+		Establish context = () => resourcery.BuildResourceNames.Always().By((c) => "test");
 
 		Because of_matching_conventionl = () => project(new SimplestPossibleModel());
 
@@ -38,7 +34,7 @@ namespace Resourcery.Specs
 
 	public class conditional_resource_name_convention : with_resourcery
 	{
-		Establish context = () => resource_name_convention((t, i) => "test").When((t,i) => false);
+		Establish context = () => resourcery.BuildResourceNames.When(c => false).By((c) => "test");
 
 		Because of_not_matching_conventionl = () => project(new SimplestPossibleModel());
 

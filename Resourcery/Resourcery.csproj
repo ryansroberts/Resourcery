@@ -44,7 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Class1.cs" />
+    <Compile Include="Conventions\Class1.cs" />
+    <Compile Include="FunctionalComposition\Chain.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Specs\functionalcomposition.cs" />
     <Compile Include="Specs\projecting_empty_model.cs" />
   </ItemGroup>
   <ItemGroup />

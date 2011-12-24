@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using Resourcery.Conventions;
+using Resourcery.FunctionalComposition;
 
 namespace Resourcery
 {
@@ -10,84 +12,16 @@ namespace Resourcery
 	{
 	}
 
-	public class ConventionResult<T>
+	public class ResourceContext
 	{
-		public readonly T Result;
-		public readonly bool ConventionMatched;
+		public readonly Type Type;
+		public readonly object Instance;
+		public ResourceContext ParentContext;
 
-		protected ConventionResult(T result, bool conventionMatched)
+		public ResourceContext(Type type, object instance)
 		{
-			Result = result;
-			ConventionMatched = conventionMatched;
-		}
-
-		public static Func<T1,T2,ConventionResult<T3>> Wrap<T1,T2,T3>(Func<T1,T2,T3> func)
-		{
-			return (t1,t2) => new ConventionResult<T3>(func(t1,t2),true);
-		}
-
-		public static ConventionResult<T> NotMatched()
-		{
-			return new ConventionResult<T>(default(T),false);
-		}
-
-		public static ConventionResult<T> Matched(T result)
-		{
-			return new ConventionResult<T>(result,true);
-		}
-	}
-
-	public class ResourceNameConvention
-	{
-		protected Func<Type, object, ConventionResult<string>> convention;
-
-		public ResourceNameConvention(Func<Type, object, string> convention)
-		{
-			this.convention = ConventionResult<string>.Wrap(convention);
-		}
-
-		public Func<ConventionResult<string>> CurrySubject(Type t, object instance)
-		{
-			return () => convention(t, instance);
-		}
-
-		public static ResourceNameConvention Default
-		{
-			get
-			{
-				return new ResourceNameConvention((t,i) => t.Name);
-			}
-		}
-
-		public void When(Func<Type,object,bool> condition)
-		{
-			convention = (t, i) =>
-			{
-				if (condition(t, i))
-				{
-					return convention(t,i);
-				}
-				return ConventionResult<string>.NotMatched();
-			};
-		}
-	}
-
-	public class ResourceNameConventions
-	{
-		protected IList<ResourceNameConvention> NameConventions = new List<ResourceNameConvention>() 
-			{ ResourceNameConvention.Default };
-
-		public Func<string> Match(Type t,object instance)
-		{
-			return () => NameConventions.Select(c => c.CurrySubject(t, instance)())
-				.First(c => c.ConventionMatched).Result;
-		}
-
-		public ResourceNameConvention Append(Func<Type, object, string> convention)
-		{
-			var nextConvention = new ResourceNameConvention(convention);
-			NameConventions.Insert(0,nextConvention);
-			return nextConvention;
+			Type = type;
+			Instance = instance;
 		}
 	}
 
@@ -114,16 +48,21 @@ namespace Resourcery
 
 	public class Resourcery
 	{
-		protected ResourceNameConventions ResourceNameConventions = new ResourceNameConventions();
+		protected ConventionRules<ResourceContext,string> ResourceNameConventions = new ConventionRules<ResourceContext, string>();
+
+		public Resourcery()
+		{
+			ResourceNameConventions.Add(Default.ResourceNameRule);
+		}
 
 		public Resource Project<T>(T model)
 		{
-			return new Resource(ResourceNameConventions.Match(typeof(T),model));	
+			return new Resource(ResourceNameConventions.Match(new ResourceContext(typeof(T),model)));	
 		}
 
-		public ResourceNameConvention BuildResourceTypeNameUsing(Func<Type, object, string> convention)
+		public ConventionRules<ResourceContext,string> BuildResourceNames
 		{
-			return ResourceNameConventions.Append(convention);
+			get { return ResourceNameConventions; }
 		}
 	}
 }
