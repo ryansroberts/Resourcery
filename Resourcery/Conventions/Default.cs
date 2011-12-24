@@ -10,5 +10,12 @@
 			}
 		}
 
+		public static ConventionRule<ResourceContext, string> RelNameRule
+		{
+			get
+			{
+				return new ConventionRule<ResourceContext, string>(c => "self",c=> true);
+			}
+		}
 	}
 }

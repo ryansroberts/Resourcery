@@ -41,4 +41,21 @@ namespace Resourcery.Specs
 		It has_resource_name_from_default_rule = () => projection.Intrinsics.Name.ShouldEqual("SimplestPossibleModel");
 	}
 
+
+	public class resource_rel_convention : with_resourcery
+	{
+		Because of_projecting_with_defaults = () => project(new SimplestPossibleModel());
+
+		It has_rel_of_self= () => projection.Intrinsics.Rel.ShouldEqual("self");
+	}
+
+	public class resource_rel_convention_always_self_for_root : with_resourcery
+	{
+		Establish convention = () => resourcery.BuildRels.Always().By(c => "test");
+
+		Because of_projecting_with_defaults = () => project(new SimplestPossibleModel());
+
+		It has_rel_of_self = () => projection.Intrinsics.Rel.ShouldEqual("self");
+	}
+
 }
