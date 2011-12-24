@@ -13,5 +13,10 @@ namespace Resourcery
 			Type = type;
 			Instance = instance;
 		}
+
+		public static ResourceContext From<T>(T model)
+		{
+			return new ResourceContext(typeof(T),model);
+		}
 	}
 }

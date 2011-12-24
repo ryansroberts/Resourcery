@@ -3,18 +3,18 @@ using Machine.Specifications;
 
 namespace Resourcery.Specs
 {
-	public class with_resourcery
+	public class with_resourcery<T>
 	{
 		protected static Resourcery resourcery;
-		protected static Resource projection;
+		protected static Resource<T> projection;
 		
 		Establish service =()=> resourcery = new Resourcery();
 
-		protected static void project<T>(T model) { projection =  resourcery.Project(model); }
+		protected static void project(T model) { projection =  resourcery.Project<T>(model); }
 	
 	}
-	
-	public class projecting_empty_model : with_resourcery
+
+	public class projecting_empty_model : with_resourcery<SimplestPossibleModel>
 	{
 		Because of_projecting_empty_model = () => project(new SimplestPossibleModel());
 
@@ -23,7 +23,7 @@ namespace Resourcery.Specs
 		It resource_name_is_type_name = () => projection.Intrinsics.Name.ShouldEqual(typeof (SimplestPossibleModel).Name);
 	}
 
-	public class resource_name_convention : with_resourcery
+	public class resource_name_convention : with_resourcery<SimplestPossibleModel>
 	{
 		Establish context = () => resourcery.BuildResourceNames.Always().By((c) => "test");
 
@@ -32,7 +32,7 @@ namespace Resourcery.Specs
 		It has_resource_name_from_convention = () => projection.Intrinsics.Name.ShouldEqual("test");
 	}
 
-	public class conditional_resource_name_convention : with_resourcery
+	public class conditional_resource_name_convention : with_resourcery<SimplestPossibleModel>
 	{
 		Establish context = () => resourcery.BuildResourceNames.When(c => false).By((c) => "test");
 
@@ -42,14 +42,14 @@ namespace Resourcery.Specs
 	}
 
 
-	public class resource_rel_convention : with_resourcery
+	public class resource_rel_convention : with_resourcery<SimplestPossibleModel>
 	{
 		Because of_projecting_with_defaults = () => project(new SimplestPossibleModel());
 
 		It has_rel_of_self= () => projection.Intrinsics.Rel.ShouldEqual("self");
 	}
 
-	public class resource_rel_convention_always_self_for_root : with_resourcery
+	public class resource_rel_convention_always_self_for_root : with_resourcery<SimplestPossibleModel>
 	{
 		Establish convention = () => resourcery.BuildRels.Always().By(c => "test");
 

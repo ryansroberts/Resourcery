@@ -4,20 +4,21 @@ namespace Resourcery
 {
 	public class Resourcery
 	{
-		protected ConventionRules<ResourceContext,string> ResourceNameConventions = new ConventionRules<ResourceContext, string>();
-		protected ConventionRules<ResourceContext, string> RelConventions = new ConventionRules<ResourceContext, string>();
+		protected internal ConventionRules<ResourceContext,string> ResourceNameConventions = new ConventionRules<ResourceContext, string>();
+		protected internal ConventionRules<ResourceContext, string> RelConventions = new ConventionRules<ResourceContext, string>();
+		protected internal ConventionRules<ResourceContext,string> HrefConventions = new ConventionRules<ResourceContext, string>(); 
 
 		public Resourcery()
 		{
 			ResourceNameConventions.Add(Default.ResourceNameRule);
-			RelConventions.MustAlways(Default.RelNameRule);
+			RelConventions.MustAlways(Default.RootRelIsAlwaysSelf);
+			HrefConventions.Add(Default.HrefIsTypeName);
+			HrefConventions.AddDecorator(Default.RootHrefIsAbsolute);
 		}
 
-		public Resource Project<T>(T model)
+		public Resource<T> Project<T>(T model)
 		{
-			return new Resource(ResourceNameConventions.Match(new ResourceContext(typeof(T),model)),
-					RelConventions.Match(new ResourceContext(typeof(T),model))
-				);	
+			return new Resource<T>(this,model);
 		}
 
 		public ConventionRules<ResourceContext,string> BuildResourceNames

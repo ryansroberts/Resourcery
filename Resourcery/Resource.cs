@@ -3,32 +3,56 @@ using System.Dynamic;
 
 namespace Resourcery
 {
-	public class Resource : DynamicObject
+	public class Resource<TModel> : DynamicObject
 	{
-		public class ResourceIntrinsics
-		{
-			readonly Func<string> resourceNameConvention;
-			readonly Func<string> relConvention;
+		readonly Resourcery resourcery;
+		readonly TModel model;
 
-			public ResourceIntrinsics(Func<string> resourceNameConvention,Func<string> relConvention )
+		public class ResourceIntrinsics<TModel>
+		{
+			readonly Resourcery resourcery;
+			readonly TModel model;
+
+			public ResourceIntrinsics(Resourcery resourcery,TModel model)
 			{
-				this.resourceNameConvention = resourceNameConvention;
-				this.relConvention = relConvention;
+				this.resourcery = resourcery;
+				this.model = model;
 			}
 
-			public string Name { get { return resourceNameConvention(); } }
+			public string Name 
+			{
+				get 
+				{
+					return resourcery.ResourceNameConventions.Match(ResourceContext.From(model))();
+				} 
+			}
 
 			public string Rel
 			{
-				get { return relConvention(); }
+				 get { return resourcery.RelConventions.Match(ResourceContext.From(model))(); } 
+			}
+
+			public string Href
+			{
+				get 
+				{
+					return resourcery.HrefConventions.Match(ResourceContext.From(model))();
+				}
 			}
 		}
 
-		public ResourceIntrinsics Intrinsics { get; protected set; }
-
-		public Resource(Func<string> nameConvention,Func<string> relConvention)
+		public ResourceIntrinsics<TModel> Intrinsics
 		{
-			Intrinsics = new ResourceIntrinsics(nameConvention,relConvention);
+			get
+			{
+				return new ResourceIntrinsics<TModel>(resourcery,model);
+			}
+		}
+
+		public Resource(Resourcery resourcery,TModel model)
+		{
+			this.resourcery = resourcery;
+			this.model = model;
 		}
 	}
 }
