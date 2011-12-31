@@ -20,7 +20,7 @@ namespace Resourcery.Specs
 
 		It has_resource = () => projection.ShouldNotBeNull();
 
-		It resource_name_is_type_name = () => projection.Intrinsics.Name.ShouldEqual(typeof (SimplestPossibleModel).Name);
+		It resource_name_is_type_name = () => projection.Name.ShouldEqual(typeof (SimplestPossibleModel).Name);
 	}
 
 	public class resource_name_convention : with_resourcery<SimplestPossibleModel>
@@ -29,7 +29,7 @@ namespace Resourcery.Specs
 
 		Because of_matching_conventionl = () => project(new SimplestPossibleModel());
 
-		It has_resource_name_from_convention = () => projection.Intrinsics.Name.ShouldEqual("test");
+		It has_resource_name_from_convention = () => projection.Name.ShouldEqual("test");
 	}
 
 	public class conditional_resource_name_convention : with_resourcery<SimplestPossibleModel>
@@ -38,7 +38,7 @@ namespace Resourcery.Specs
 
 		Because of_not_matching_conventionl = () => project(new SimplestPossibleModel());
 
-		It has_resource_name_from_default_rule = () => projection.Intrinsics.Name.ShouldEqual("SimplestPossibleModel");
+		It has_resource_name_from_default_rule = () => projection.Name.ShouldEqual("SimplestPossibleModel");
 	}
 
 
@@ -46,7 +46,7 @@ namespace Resourcery.Specs
 	{
 		Because of_projecting_with_defaults = () => project(new SimplestPossibleModel());
 
-		It has_rel_of_self= () => projection.Intrinsics.Rel.ShouldEqual("self");
+		It has_rel_of_self= () => projection.Rel.ShouldEqual("self");
 	}
 
 	public class resource_rel_convention_always_self_for_root : with_resourcery<SimplestPossibleModel>
@@ -55,7 +55,7 @@ namespace Resourcery.Specs
 
 		Because of_projecting_with_defaults = () => project(new SimplestPossibleModel());
 
-		It has_rel_of_self = () => projection.Intrinsics.Rel.ShouldEqual("self");
+		It has_rel_of_self = () => projection.Rel.ShouldEqual("self");
 	}
 
 }

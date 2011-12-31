@@ -4,6 +4,7 @@ using System.Linq;
 
 namespace Resourcery.Conventions
 {
+
 	public class ConventionRules<ContextType,ResultType>
 	{
 		protected ConventionRule<ContextType,ResultType> mustAlways = 
@@ -12,15 +13,25 @@ namespace Resourcery.Conventions
 		protected Stack<ConventionRule<ContextType, ResultType>> rules = new Stack<ConventionRule<ContextType, ResultType>>();
 		protected Stack<ConventionRuleDecorator<ContextType, ResultType>> decorators = new Stack<ConventionRuleDecorator<ContextType, ResultType>>(); 
 
-		public Func<ResultType> Match(ContextType context)
+		public Func<ResultType> MatchOne(ContextType context)
 		{
 			return ApplyDecoratorsTo(context, () =>
 			{
 					if (mustAlways.condition(context))
 						return mustAlways.builder(context);
 					return rules.Where(conventionRule => conventionRule.condition(context)).Select(r => r.builder(context))
-						.FirstOrDefault();
+						.First();
 			});
+		}
+
+		public Func<IEnumerable<ResultType>> MatchAny(ContextType context) { return () => MatchAnyImplementation(context); }
+
+		IEnumerable<ResultType> MatchAnyImplementation(ContextType context)
+		{
+			if (mustAlways.condition(context))
+				yield return ApplyDecoratorsTo(context, () => mustAlways.builder(context))();
+			foreach (var match in rules.Where(conventionRule => conventionRule.condition(context)).Select(r => r.builder(context)))
+				yield return match;
 		}
 
 		protected Func<ResultType> ApplyDecoratorsTo(ContextType context,Func<ResultType> result)
@@ -52,6 +63,11 @@ namespace Resourcery.Conventions
 		public void AddDecorator(ConventionRuleDecorator<ContextType,ResultType> decorator)
 		{
 			decorators.Push(decorator);
+		}
+
+		public void Add(IEnumerable<ConventionRule<ContextType, ResultType>> rules)
+		{
+			foreach(var rule in rules) Add(rule);
 		}
 	}
 }
