@@ -58,7 +58,6 @@ namespace Resourcery
 		protected internal ConventionRules<ResourceAttributeContext,Attribute> AttributeConventions  = new ConventionRules<ResourceAttributeContext, Attribute>();
 		protected internal ConventionRules<ResourceContext,IEnumerable<Form>> FormConventions = new ConventionRules<ResourceContext, IEnumerable<Form>>(); 
 
-
 		public Resourcery()
 		{
 			ResourceNameConventions.Add(Default.ResourceNameRule);
@@ -72,6 +71,12 @@ namespace Resourcery
 		{
 			return new Resource<T>(this,model);
 		}
+
+		public Resource<T> ProjectEmbedded<T>(T model,Resource parent)
+		{
+			return new Resource<T>(this, model,parent);
+		}
+
 
 		public ConventionRules<ResourceContext,string> BuildResourceNames
 		{

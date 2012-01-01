@@ -1,36 +1,35 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Resourcery.Conventions
 {
 
 	public class ConventionRules<ContextType,ResultType>
 	{
-		protected ConventionRule<ContextType,ResultType> mustAlways = 
-			new ConventionRule<ContextType,ResultType> (c => default(ResultType),c => false); 
-
+		protected ConventionRule<ContextType,ResultType> mustAlways = new ConventionRule<ContextType,ResultType> (c => default(ResultType),c => false); 
 		protected Stack<ConventionRule<ContextType, ResultType>> rules = new Stack<ConventionRule<ContextType, ResultType>>();
-		protected Stack<ConventionRuleDecorator<ContextType, ResultType>> decorators = new Stack<ConventionRuleDecorator<ContextType, ResultType>>(); 
+		protected Stack<ConventionRuleDecorator<ContextType, ResultType>> decorators = new Stack<ConventionRuleDecorator<ContextType, ResultType>>();
+		
+		public Func<IEnumerable<ResultType>> MatchAny(ContextType context) { return () => MatchAnyImplementation(context); }
 
 		public Func<ResultType> MatchOne(ContextType context)
 		{
 			return ApplyDecoratorsTo(context, () =>
 			{
-					if (mustAlways.condition(context))
-						return mustAlways.builder(context);
-					return rules.Where(conventionRule => conventionRule.condition(context)).Select(r => r.builder(context))
+					if (mustAlways.Condition(context))
+						return mustAlways.Builder(context);
+					return rules.Where(conventionRule => conventionRule.Condition(context)).Select(r => r.Builder(context))
 						.First();
 			});
 		}
 
-		public Func<IEnumerable<ResultType>> MatchAny(ContextType context) { return () => MatchAnyImplementation(context); }
-
 		IEnumerable<ResultType> MatchAnyImplementation(ContextType context)
 		{
-			if (mustAlways.condition(context))
-				yield return ApplyDecoratorsTo(context, () => mustAlways.builder(context))();
-			foreach (var match in rules.Where(conventionRule => conventionRule.condition(context)).Select(r => r.builder(context)))
+			if (mustAlways.Condition(context))
+				yield return ApplyDecoratorsTo(context, () => mustAlways.Builder(context))();
+			foreach (var match in rules.Where(conventionRule => conventionRule.Condition(context)).Select(r => r.Builder(context)))
 				yield return match;
 		}
 
@@ -53,7 +52,7 @@ namespace Resourcery.Conventions
 			rules.Push(rule);
 		}
 
-		public ConventionBuilder<ContextType, ResultType> When(Func<ContextType,bool> condition)
+		public ConventionBuilder<ContextType, ResultType> When(Expression<Func<ContextType,bool>> condition)
 		{
 			return  new ConventionBuilder<ContextType, ResultType>(condition,Add);
 		}

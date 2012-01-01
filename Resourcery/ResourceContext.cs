@@ -8,9 +8,14 @@ namespace Resourcery
 	public class ResourceContext
 	{
 		public readonly Type Type;
-		public readonly object Instance;
 		public ResourceContext ParentContext;
 		public readonly Resourcery Resourcery;
+		public readonly Resource Resource;
+
+		public  object Instance
+		{
+			get { return Resource.Instance; }
+		}
 
 		public IEnumerable<ResourceAttributeContext> Attributes
 		{
@@ -22,16 +27,21 @@ namespace Resourcery
 			}
 		}
 
-		protected ResourceContext(Type type, object instance,Resourcery resourcery)
+		
+		ResourceContext(Resource resource,Type type, ResourceContext parentContext, Resourcery resourcery)
 		{
+			Resource = resource;
 			Type = type;
-			Instance = instance;
+			ParentContext = parentContext;
 			Resourcery = resourcery;
 		}
 
-		public static ResourceContext From<T>(T model,Resourcery resourcery)
+
+		public static ResourceContext From(Resource resource,Resourcery resourcery,ResourceContext parent)
 		{
-			return new ResourceContext(typeof(T),model,resourcery);
+			if (resource == null) return null;
+
+			return new ResourceContext(resource,resource.Instance.GetType(),parent,resourcery);
 		}
 	}
 

@@ -63,7 +63,8 @@ namespace Resourcery.Conventions
 
 		public static IEnumerable<ConventionRule<ResourceAttributeContext,Attribute>> SimpleTypeAttributes
 		{
-			get {
+			get 
+			{
 				yield return AttributeForType<int>();
 				yield return EnumerableAttributeForType<int>();
 				yield return AttributeForType<Int16>();

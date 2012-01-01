@@ -17,8 +17,6 @@ namespace Resourcery.Specs
 
 		Because project_resource_with_form = () => project(new UpdateableResource());
 
-		It has_form =()=> projection.Forms.ShouldNotBeEmpty()
-
-
+		It has_form = () => projection.Forms.ShouldNotBeEmpty();
 	}
 }

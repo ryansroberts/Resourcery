@@ -19,7 +19,7 @@ namespace Resourcery.Specs
 	public class href_convention_for_type : with_resourcery<SimpleModel>
 	{
 		Establish href_for_simplemodel = () => resourcery.BuildHrefs.WhenResourceIsOfType(typeof(SimpleModel))
-			.By(c => c.Type.Name.ToLower() + "/"  + ((dynamic)c.Instance).Id);
+			.By(c => c.Type.Name.ToLower() + "/"  + ((SimpleModel)c.Instance).Id);
 
 		Because of_projecting_with_href_convention = () => project(new SimpleModel(){Id = 12});
 
