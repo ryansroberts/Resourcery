@@ -115,6 +115,7 @@ namespace Resourcery.Configuration
 
 
 
+
 	public abstract class ResourceRule
 	{
 		static readonly Func<object, bool> defaultpredicate = r => false;
